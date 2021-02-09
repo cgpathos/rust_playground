@@ -6,137 +6,122 @@ use std::io;
 use rand::Rng;
 
 fn main() {
-    //
-    let space = "                  ";
-    let space = space.len();
+    // 소유권
+    {
+        let s = "hello";
+        println!("{}", s);
+    }
+    // println!("{}", s); // panic occur!! - out of scope
+
+    let mut s = String::from("hello");
+    s.push_str(", world!");
+
+    println!("{}", s);
 
 
-    let _guess: u32 = "42".parse().expect("Not a number");
-    let hangeul = '야';
-
-    let tup: (i32, f64, u8) = (500, 6.34, 1);
-
-    let (x, y, z) = tup;
-    println!("The value of y is {}", y);
-
-    let x: (i32, f64, u8) = (500, 6.4, 1);
-    let five_hundred = x.0;
-    let six_point_four = x.1;
-    let one = x.2;
-
-    let array = [1, 2, 3, 4, 5, ];
-
-    let first = array[0];
-    let second = array[1];
-    let last = array[4];
-
-    println!("array last : {}", last);
+    let s1 = String::from("hello");
+    let s2 = s1;
+    // println!("{}, world!", s1); // error
 
 
-    another_function(5, 6);
+    let s = String::from("hello");
+    takes_ownership(s);
+    // println!("{}_~~~~~~~", s); // error
 
     let x = 5;
-    let y = {
-        let x = 3;
-        x + 1
-    };
+    makes_copy(x);
+    println!("{}_~~~~", x);
 
-    println!("The value of y is : {}", y);
+    let s1 = gives_ownership();
 
+    let s2 = String::from("hello");
 
-    println!("f is {}", test());
+    let s3 = takes_and_gives_back(s2);
 
-    println!("plus_one is {}", plus_one(4));
+    let s1 = String::from("no!!!!!!!!!!");
+    let (s2, len) = calculate_length(s1);
+    println!("s2 :: {}", s2);
 
-    // 한줄 주석
-    /*
-    여러줄 주석
+    let len = calculate_length_reference(&s2);
+    println!("s2 :: {}", s2);
 
-    잇힝
-     */
+    let mut s = String::from("hello~~~~~~~");
+    change(&mut s);
+    println!("{}", s);
 
+    let mut s = String::from("hello");
+    let r1 = &s;
+    let r2 = &s;
+    let r3 = &mut s;
 
-    let number = 6;
-
-    if number % 4 == 0 {
-        println!("number is divisible by 4");
-    } else if number % 3 == 0 {
-        println!("number is divisible by 3");
-    } else if number % 2 == 0 {
-        println!("number is divisible by 2");
-    } else {
-        println!("number is divisible by 4, 3 or 2");
-    }
+    // let reference_to_nothing = dangle();
 
 
-    let condition = true;
-    let number = if condition {
-        5
-    } else {
-        6 // "six" lead to error.
-    };
-    println!("The value of number is : {}", number);
+    let mut s = String::from("hello world");
+    let word = first_word(&s);
+    println!("word -> {}", word);
 
+    let mut s = String::from("hello world");
+    let hello = &s[0..5];
+    let world = &s[6..11];
+    println!("{} {}", hello, world);
 
-    // Clion에서 그냥 돌렸더니 컴터 죽을라고 함
-    // loop {
-    //     println!("again!");
-    // }
+    let my_string = String::from("hello world");
 
-    let mut number = 3;
+    let word = first_word(&my_string[..]);
 
-    while number != 0 {
-        println!("{}!", number);
-        number = number - 1;
-    }
+    let my_string_literal = "hello world";
 
-    println!("LIFTOFF!!!");
+    let word = first_word(&my_string_literal[..]);
 
-
-    let a = [10, 20, 30, 40, 50, ];
-
-    // while
-    let mut index = 0;
-    while index < 5 {
-        println!("the value is : {}", a[index]);
-        index = index + 1;
-    }
-
-    // for
-    for element in a.iter() {
-        println!("the value is : {}", element);
-    }
-
-
-    for number in (1..4).rev() {
-        println!("{}!", number);
-    }
-
-    println!("LIFTOFF!!!");
-
-    for n in 0..10 {
-        println!("{} -> {}", n, fibo(n))
-    }
+    let word = first_word(my_string_literal);
 }
 
-fn fibo(n: u32) -> u32 {
-    if n < 2 {
-        n
-    } else {
-        fibo(n - 1) + fibo(n - 2)
+fn first_word(s: &str) -> &str {
+    let bytes = s.as_bytes();
+
+    for (i, &item) in bytes.iter().enumerate() {
+        if item == b' ' {
+            return &s[0..i];
+        }
     }
+
+    &s[..]
 }
 
-fn another_function(x: i32, y: i32) {
-    println!("The value if x is : {}", x);
-    println!("The value if y is : {}", y);
+
+// error
+// fn dangle() -> &String {
+//     let s = String::from("hello");
+//     &s
+// }
+
+fn change(some_string: &mut String) {
+    some_string.push_str(", world!!");
 }
 
-fn test() -> u32 {
-    let f = 32;
-    f
+fn calculate_length(s: String) -> (String, usize) {
+    let length = s.len();
+    (s, length)
 }
 
-fn plus_one(x: i32) -> i32 {
-    x + 1
+fn calculate_length_reference(s: &String) -> usize {
+    s.len()
+}
+
+fn takes_ownership(some_string: String) {
+    println!("{}", some_string);
+}
+
+fn makes_copy(some_integer: i32) {
+    println!("{}", some_integer);
+}
+
+fn gives_ownership() -> String {
+    let some_string = String::from("hello");
+    some_string
+}
+
+fn takes_and_gives_back(a_string: String) -> String {
+    a_string
 }
