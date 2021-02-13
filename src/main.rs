@@ -1,127 +1,116 @@
-extern crate rand;
+struct User {
+    username: String,
+    email: String,
+    sign_in_count: u64,
+    active: bool,
+}
 
-use std::cmp::Ordering;
-use std::io;
+struct Color(i32, i32, i32);
 
-use rand::Rng;
+struct Point(i32, i32, i32);
+
+#[derive(Debug)]
+struct Rectangle {
+    length: u32,
+    width: u32,
+}
+
+impl Rectangle {
+    fn area(&self) -> u32 {
+        self.length * self.width
+    }
+
+    fn can_hold(&self, other: &Rectangle) -> bool {
+        self.length > other.length && self.width > other.width
+    }
+
+    fn square(size: u32) -> Rectangle {
+        Rectangle { length: size, width: size }
+    }
+}
 
 fn main() {
-    // 소유권
-    {
-        let s = "hello";
-        println!("{}", s);
+    let mut user1 = User {
+        email: String::from("someone@example.com"),
+        username: String::from("someusername123"),
+        active: true,
+        sign_in_count: 1,
+    };
+
+    user1.email = String::from("anotheremail@example.com");
+
+    let user2 = User {
+        email: String::from("another@example.com"),
+        username: String::from("anotherusername567"),
+        active: user1.active,
+        sign_in_count: user1.sign_in_count,
+    };
+
+    let user2 = User {
+        email: String::from("another@example.com"),
+        username: String::from("anotherusername567"),
+        ..user1
+    };
+
+    let black = Color(0, 0, 0);
+    let origin = Point(0, 0, 0);
+
+
+    let length1 = 50;
+    let width1 = 30;
+
+    println!(
+        "The area of the rectangle is {} square pixels.",
+        area(length1, width1));
+
+    let rect1 = (50, 30);
+
+    println!(
+        "The area of the rectangle is {} square pixels.",
+        area2(rect1));
+
+    let rect1 = Rectangle { length: 50, width: 30 };
+
+    println!(
+        "The area of the rectangle is {} square pixels.",
+        area3(&rect1));
+
+    println!("rect1 is {:#?}", rect1);
+
+    println!(
+        "The area of the rectangle is {} square pixels.",
+        rect1.area());
+
+
+    let rect1 = Rectangle { length: 50, width: 30 };
+    let rect2 = Rectangle { length: 40, width: 10 };
+    let rect3 = Rectangle { length: 45, width: 60 };
+
+    println!("Can rect1 hold rect2? {}", rect1.can_hold(&rect2));
+    println!("Can rect1 hold rect3? {}", rect1.can_hold(&rect3));
+
+    let square = Rectangle::square(55);
+
+    println!("square : {:#?}", square);
+}
+
+fn area3(rectangle: &Rectangle) -> u32 {
+    rectangle.length * rectangle.width
+}
+
+fn area2(dimensions: (u32, u32)) -> u32 {
+    dimensions.0 * dimensions.1
+}
+
+fn area(length: u32, width: u32) -> u32 {
+    length * width
+}
+
+fn build_user(email: String, username: String) -> User {
+    User {
+        email,
+        username,
+        active: true,
+        sign_in_count: 1,
     }
-    // println!("{}", s); // panic occur!! - out of scope
-
-    let mut s = String::from("hello");
-    s.push_str(", world!");
-
-    println!("{}", s);
-
-
-    let s1 = String::from("hello");
-    let s2 = s1;
-    // println!("{}, world!", s1); // error
-
-
-    let s = String::from("hello");
-    takes_ownership(s);
-    // println!("{}_~~~~~~~", s); // error
-
-    let x = 5;
-    makes_copy(x);
-    println!("{}_~~~~", x);
-
-    let s1 = gives_ownership();
-
-    let s2 = String::from("hello");
-
-    let s3 = takes_and_gives_back(s2);
-
-    let s1 = String::from("no!!!!!!!!!!");
-    let (s2, len) = calculate_length(s1);
-    println!("s2 :: {}", s2);
-
-    let len = calculate_length_reference(&s2);
-    println!("s2 :: {}", s2);
-
-    let mut s = String::from("hello~~~~~~~");
-    change(&mut s);
-    println!("{}", s);
-
-    let mut s = String::from("hello");
-    let r1 = &s;
-    let r2 = &s;
-    let r3 = &mut s;
-
-    // let reference_to_nothing = dangle();
-
-
-    let mut s = String::from("hello world");
-    let word = first_word(&s);
-    println!("word -> {}", word);
-
-    let mut s = String::from("hello world");
-    let hello = &s[0..5];
-    let world = &s[6..11];
-    println!("{} {}", hello, world);
-
-    let my_string = String::from("hello world");
-
-    let word = first_word(&my_string[..]);
-
-    let my_string_literal = "hello world";
-
-    let word = first_word(&my_string_literal[..]);
-
-    let word = first_word(my_string_literal);
-}
-
-fn first_word(s: &str) -> &str {
-    let bytes = s.as_bytes();
-
-    for (i, &item) in bytes.iter().enumerate() {
-        if item == b' ' {
-            return &s[0..i];
-        }
-    }
-
-    &s[..]
-}
-
-
-// error
-// fn dangle() -> &String {
-//     let s = String::from("hello");
-//     &s
-// }
-
-fn change(some_string: &mut String) {
-    some_string.push_str(", world!!");
-}
-
-fn calculate_length(s: String) -> (String, usize) {
-    let length = s.len();
-    (s, length)
-}
-
-fn calculate_length_reference(s: &String) -> usize {
-    s.len()
-}
-
-fn takes_ownership(some_string: String) {
-    println!("{}", some_string);
-}
-
-fn makes_copy(some_integer: i32) {
-    println!("{}", some_integer);
-}
-
-fn gives_ownership() -> String {
-    let some_string = String::from("hello");
-    some_string
-}
-
-fn takes_and_gives_back(a_string: String) -> String {
-    a_string
 }
