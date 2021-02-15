@@ -1,116 +1,124 @@
-struct User {
-    username: String,
-    email: String,
-    sign_in_count: u64,
-    active: bool,
+enum IpAddrKind {
+    V4,
+    V6,
 }
 
-struct Color(i32, i32, i32);
+enum IpAddr {
+    V4(u8, u8, u8, u8),
+    V6(String),
+}
 
-struct Point(i32, i32, i32);
+enum Message {
+    Quit,
+    Move { x: i32, y: i32 },
+    Write(String),
+    ChangeColor(i32, i32, i32),
+}
+
+impl Message {
+    fn call(&self) {}
+}
 
 #[derive(Debug)]
-struct Rectangle {
-    length: u32,
-    width: u32,
+enum UsState {
+    Alabama,
+    Alaska,
 }
 
-impl Rectangle {
-    fn area(&self) -> u32 {
-        self.length * self.width
-    }
-
-    fn can_hold(&self, other: &Rectangle) -> bool {
-        self.length > other.length && self.width > other.width
-    }
-
-    fn square(size: u32) -> Rectangle {
-        Rectangle { length: size, width: size }
-    }
+enum Coin {
+    Penny,
+    Nickel,
+    Dime,
+    Quarter(UsState),
 }
 
 fn main() {
-    let mut user1 = User {
-        email: String::from("someone@example.com"),
-        username: String::from("someusername123"),
-        active: true,
-        sign_in_count: 1,
+    let four = IpAddrKind::V4;
+    let six = IpAddrKind::V6;
+
+    route(IpAddrKind::V4);
+    route(IpAddrKind::V6);
+
+    // let home = IpAddr {
+    //     kind: IpAddrKind::V4,
+    //     address: String::from("127.0.0.1"),
+    // };
+    // let loopback = IpAddr {
+    //     kind: IpAddrKind::V6,
+    //     address: String::from("::1"),
+    // };
+
+    // let home = IpAddr::V4(String::from("127.0.0.1"));
+    // let loopback = IpAddr::V6(String::from("::1"));
+
+    let home = IpAddr::V4(127, 0, 0, 1);
+    let loopback = IpAddr::V6(String::from("::1"));
+
+    let m = Message::Write(String::from("hello"));
+    m.call();
+
+    let some_number = Some(5);
+    let some_string = Some("a string");
+
+    let absent_number: Option<i32> = None;
+
+    let five = Some(5);
+    let six = plus_one(five);
+    let none = plus_one(None);
+
+    let some_u8_value = 0u8;
+    match some_u8_value {
+        1 => println!("one"),
+        3 => println!("three"),
+        5 => println!("five"),
+        7 => println!("seven"),
+        _ => {}
     };
 
-    user1.email = String::from("anotheremail@example.com");
+    let some_u8_value = Some(0u8);
+    match some_u8_value {
+        Some(3) => printnl!("three"),
+        _ => (),
+    }
 
-    let user2 = User {
-        email: String::from("another@example.com"),
-        username: String::from("anotherusername567"),
-        active: user1.active,
-        sign_in_count: user1.sign_in_count,
-    };
+    if let Some(3) = some_u8_value {
+        printnl!("three");
+    }
 
-    let user2 = User {
-        email: String::from("another@example.com"),
-        username: String::from("anotherusername567"),
-        ..user1
-    };
+    let mut count = 0;
+    let coin = Coin::Penny;
+    // match coin {
+    //     Coin::Quarter(state) => println!("State quarter from {:?}!", state),
+    //     _ => count += 1,
+    // }
 
-    let black = Color(0, 0, 0);
-    let origin = Point(0, 0, 0);
-
-
-    let length1 = 50;
-    let width1 = 30;
-
-    println!(
-        "The area of the rectangle is {} square pixels.",
-        area(length1, width1));
-
-    let rect1 = (50, 30);
-
-    println!(
-        "The area of the rectangle is {} square pixels.",
-        area2(rect1));
-
-    let rect1 = Rectangle { length: 50, width: 30 };
-
-    println!(
-        "The area of the rectangle is {} square pixels.",
-        area3(&rect1));
-
-    println!("rect1 is {:#?}", rect1);
-
-    println!(
-        "The area of the rectangle is {} square pixels.",
-        rect1.area());
-
-
-    let rect1 = Rectangle { length: 50, width: 30 };
-    let rect2 = Rectangle { length: 40, width: 10 };
-    let rect3 = Rectangle { length: 45, width: 60 };
-
-    println!("Can rect1 hold rect2? {}", rect1.can_hold(&rect2));
-    println!("Can rect1 hold rect3? {}", rect1.can_hold(&rect3));
-
-    let square = Rectangle::square(55);
-
-    println!("square : {:#?}", square);
+    if let Coin::Quarter(state) = coin {
+        println!("State quarter from {:?}!", state);
+    } else {
+        count += 1;
+    }
 }
 
-fn area3(rectangle: &Rectangle) -> u32 {
-    rectangle.length * rectangle.width
+fn route(ip_type: IpAddrKind) {}
+
+fn value_in_cents(coin: Coin) -> u32 {
+    match coin {
+        Coin::Penny => {
+            println!("Lucky penny!");
+            1
+        }
+        Coin::Nickel => 5,
+        Coin::Dime => 10,
+        Coin::Quarter(state) => {
+            println!("State quarter from {:?}!", state);
+            25
+        }
+    }
 }
 
-fn area2(dimensions: (u32, u32)) -> u32 {
-    dimensions.0 * dimensions.1
-}
-
-fn area(length: u32, width: u32) -> u32 {
-    length * width
-}
-
-fn build_user(email: String, username: String) -> User {
-    User {
-        email,
-        username,
-        active: true,
-        sign_in_count: 1,
+fn plus_one(x: Option<i32>) -> Option<i32> {
+    match x {
+        None => None,
+        Some(i) => Some(i + 1),
     }
 }
